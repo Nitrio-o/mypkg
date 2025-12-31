@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 # sysinfo_pub（ROS 2 パッケージ）
 
 ![test](https://github.com/Nitrio-o/sysinfo_pub/actions/workflows/test.yml/badge.svg)
@@ -125,5 +124,3 @@ GitHub Actions により以下のテストを自動実行しています。
 ---
 
 © 2025 Ryusei Abe
-EOF
-
