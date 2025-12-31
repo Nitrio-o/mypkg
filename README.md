@@ -42,57 +42,6 @@ ROS 2 のトピック通信（Publisher / Subscriber）の理解を目的とし�
 ```bash
 ros2 run sysinfo_pub sysinfo_pub
 
----
-cat << 'EOF' > README.md
-# sysinfo_pub（ROS 2 パッケージ）
-
-![test](https://github.com/Nitrio-o/sysinfo_pub/actions/workflows/test.yml/badge.svg)
-
-## 概要
-
-sysinfo_pub は、ROS 2 上で動作するシステム情報配信ノードを提供するパッケージです。  
-ノードは ROS 2 のトピック通信を用いて、取得したシステム情報を定期的に publish します。
-
-本パッケージは、講義「ロボットシステム学」における  
-ROS 2 のトピック通信（Publisher / Subscriber）の理解を目的として作成しました。
-
----
-
-## 提供するノード
-
-### sysinfo_pub ノード
-
-- 機能  
-  実行環境のシステム情報を取得し、ROS 2 のトピックとして定期的に publish します。
-
-- 使用する通信方式  
-  - トピック通信（Publisher）
-
-- トピック名  
-  - `/sysinfo`
-
-- メッセージ型  
-  - `std_msgs/msg/String`
-
-- publish 内容（例）  
-  - OS 情報  
-  - CPU 情報  
-  - メモリ使用状況  
-
----
-
-## 出力例
-
-os: Ubuntu 24.04 LTS, cpu: Intel(R) Core(TM), memory: 42%
-
----
-## 実行方法
-
-### ノードの起動
-
-```bash
-ros2 run sysinfo_pub sysinfo_pub
-
 ## 動作環境
 
 - Ubuntu 24.04 LTS
