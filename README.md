@@ -1,43 +1,98 @@
 cat << 'EOF' > README.md
-# mean コマンド
+# sysinfo_pub（ROS 2 パッケージ）
 
-![test](https://github.com/Nitrio-o/mypkg/actions/workflows/test.yml/badge.svg)
+![test](https://github.com/Nitrio-o/sysinfo_pub/actions/workflows/test.yml/badge.svg)
 
 ## 概要
 
-mean は、標準入力から読み込んだ数値データの平均値を計算し、
-結果を標準出力に出力する ROS 2 向けのフィルタ型コマンドです。
+sysinfo_pub は、ROS 2 上で動作するシステム情報配信ノードを提供するパッケージです。  
+ノードは ROS 2 のトピック通信を用いて、取得したシステム情報を定期的に publish します。
 
-数値は改行区切りで入力することを想定しています。
-
----
-
-## 使い方
-
-### 基本的な使い方
-
-    seq 5 | mean
-
-### 出力例
-
-    3.0
+本パッケージは、講義「ロボットシステム学」における  
+ROS 2 のトピック通信（Publisher / Subscriber）の理解を目的として作成しました。
 
 ---
 
-## 仕様
+## 提供するノード
 
-- 入力  
-  標準入力（数値、改行区切り）
+### sysinfo_pub ノード
 
-- 出力  
-  標準出力（平均値のみ）
+- 機能  
+  実行環境のシステム情報を取得し、ROS 2 のトピックとして定期的に publish します。
 
-- 異常系  
-  数値でない入力、または無入力の場合は  
-  標準エラー出力にエラーメッセージを出し、  
-  終了ステータス 1 で終了します
+- 使用する通信方式  
+  - トピック通信（Publisher）
+
+- トピック名  
+  - `/sysinfo`
+
+- メッセージ型  
+  - `std_msgs/msg/String`
+
+- publish 内容（例）  
+  - OS 情報  
+  - CPU 情報  
+  - メモリ使用状況  
 
 ---
+
+## 実行方法
+
+### ノードの起動
+
+```bash
+ros2 run sysinfo_pub sysinfo_pub
+
+---
+cat << 'EOF' > README.md
+# sysinfo_pub（ROS 2 パッケージ）
+
+![test](https://github.com/Nitrio-o/sysinfo_pub/actions/workflows/test.yml/badge.svg)
+
+## 概要
+
+sysinfo_pub は、ROS 2 上で動作するシステム情報配信ノードを提供するパッケージです。  
+ノードは ROS 2 のトピック通信を用いて、取得したシステム情報を定期的に publish します。
+
+本パッケージは、講義「ロボットシステム学」における  
+ROS 2 のトピック通信（Publisher / Subscriber）の理解を目的として作成しました。
+
+---
+
+## 提供するノード
+
+### sysinfo_pub ノード
+
+- 機能  
+  実行環境のシステム情報を取得し、ROS 2 のトピックとして定期的に publish します。
+
+- 使用する通信方式  
+  - トピック通信（Publisher）
+
+- トピック名  
+  - `/sysinfo`
+
+- メッセージ型  
+  - `std_msgs/msg/String`
+
+- publish 内容（例）  
+  - OS 情報  
+  - CPU 情報  
+  - メモリ使用状況  
+
+---
+
+## 出力例
+
+os: Ubuntu 24.04 LTS, cpu: Intel(R) Core(TM), memory: 42%
+
+---
+## 実行方法
+
+### ノードの起動
+
+```bash
+ros2 run sysinfo_pub sysinfo_pub
 
 ## 動作環境
 
