@@ -13,23 +13,31 @@ cd "$dir/ros2_ws"
 # ビルド
 colcon build --symlink-install --packages-select sysinfo_pub
 
+# ------------------------------------------------------------
 # 環境設定
+#   colconのsetup.bashは COLCON_TRACE 未定義だと set -u で落ちることがあるため対策
+# ------------------------------------------------------------
+: "${COLCON_TRACE:=}"   # 未定義なら空文字で定義
 source "$dir/ros2_ws/install/setup.bash"
 
+# ------------------------------------------------------------
 # publisher 起動（ログ保持）
+# ------------------------------------------------------------
 timeout 60 ros2 run sysinfo_pub sysinfo_pub > /tmp/sysinfo_pub.log 2>&1 &
 PUB_PID=$!
 
-# 終了時に後片付け
 cleanup() {
   kill "$PUB_PID" 2>/dev/null || true
 }
 trap cleanup EXIT
 
+# ------------------------------------------------------------
 # topic が見えるまで待つ（最大30秒）
+#   ・publisher が死んだら即ログを吐いて失敗（原因特定）
+# ------------------------------------------------------------
 ok=0
 for i in $(seq 1 60); do
-  # publisher が死んでたらログを吐いて即失敗（原因特定用）
+  # publisher が落ちていないか確認
   if ! kill -0 "$PUB_PID" 2>/dev/null; then
     echo "[ERROR] sysinfo_pub exited early"
     echo "===== /tmp/sysinfo_pub.log ====="
@@ -52,9 +60,15 @@ if [ "$ok" -ne 1 ]; then
   exit 1
 fi
 
+# ------------------------------------------------------------
 # subscriber 実行（短時間）
+# ------------------------------------------------------------
 timeout 15 ros2 run sysinfo_pub sysinfo_sub > /tmp/sysinfo_sub.log 2>&1 || true
 
+# ------------------------------------------------------------
 # 「受信できた」ことの証明
+#   ・ログが空でない
+#   ・cpu= を含む
+# ------------------------------------------------------------
 test -s /tmp/sysinfo_sub.log
 grep -F "cpu=" /tmp/sysinfo_sub.log > /dev/null
