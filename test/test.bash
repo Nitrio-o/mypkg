@@ -11,17 +11,16 @@ cd "$dir/ros2_ws"
 colcon build --symlink-install --packages-select sysinfo_pub
 source "$dir/ros2_ws/install/setup.bash"
 
-timeout 15 ros2 run sysinfo_pub sysinfo_pub > /tmp/sysinfo_pub.log 2>&1 &
+# 10秒動かしてログを採取（講義と同じ）
+timeout 10 ros2 run sysinfo_pub sysinfo_pub > /tmp/sysinfo_pub.log 2>&1 &
 PUB_PID=$!
 
-ok=0
-for i in $(seq 1 20); do
-  ros2 topic list 2>/dev/null | grep -F "/sysinfo" >/dev/null && ok=1 && break
-  sleep 0.5
-done
-test "$ok" -eq 1
-
+# sub を起動して受信ログを採取
 timeout 10 ros2 run sysinfo_pub sysinfo_sub > /tmp/sysinfo_sub.log 2>&1 || true
-test -s /tmp/sysinfo_sub.log
 
+# 「受信できた」ことの証明：cpu= と mem= が含まれる行が1つ以上ある
+grep -E "cpu=.*mem=.*disk=" /tmp/sysinfo_sub.log > /dev/null
+
+# 後片付け
 kill "$PUB_PID" 2>/dev/null || true
+
