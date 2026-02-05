@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-# ホームディレクトリ（CI/ローカル両対応）
+# ホームディレクトリ（CI / ローカル両対応）
 dir=~
 [ "${1:-}" != "" ] && dir="$1"
 
@@ -15,10 +15,13 @@ colcon build --symlink-install --packages-select sysinfo_pub
 
 # ------------------------------------------------------------
 # 環境設定
-#   colconのsetup.bashは COLCON_TRACE 未定義だと set -u で落ちることがあるため対策
+# colcon の setup.bash / local_setup.bash は
+# 未定義変数を参照するため set -u のまま source すると落ちる
+# → source の瞬間だけ nounset を無効化する
 # ------------------------------------------------------------
-: "${COLCON_TRACE:=}"   # 未定義なら空文字で定義
+set +u
 source "$dir/ros2_ws/install/setup.bash"
+set -u
 
 # ------------------------------------------------------------
 # publisher 起動（ログ保持）
@@ -33,13 +36,12 @@ trap cleanup EXIT
 
 # ------------------------------------------------------------
 # topic が見えるまで待つ（最大30秒）
-#   ・publisher が死んだら即ログを吐いて失敗（原因特定）
 # ------------------------------------------------------------
 ok=0
 for i in $(seq 1 60); do
-  # publisher が落ちていないか確認
+  # publisher が落ちていたらログを出して終了
   if ! kill -0 "$PUB_PID" 2>/dev/null; then
-    echo "[ERROR] sysinfo_pub exited early"
+    echo "[エラー] sysinfo_pub が起動直後に終了しました"
     echo "===== /tmp/sysinfo_pub.log ====="
     cat /tmp/sysinfo_pub.log || true
     exit 1
@@ -50,7 +52,7 @@ for i in $(seq 1 60); do
 done
 
 if [ "$ok" -ne 1 ]; then
-  echo "[ERROR] /sysinfo topic not found"
+  echo "[エラー] /sysinfo トピックが見つかりません"
   echo "===== ros2 node list ====="
   ros2 node list || true
   echo "===== ros2 topic list ====="
@@ -66,9 +68,7 @@ fi
 timeout 15 ros2 run sysinfo_pub sysinfo_sub > /tmp/sysinfo_sub.log 2>&1 || true
 
 # ------------------------------------------------------------
-# 「受信できた」ことの証明
-#   ・ログが空でない
-#   ・cpu= を含む
+# 「受信できた」ことの確認
 # ------------------------------------------------------------
 test -s /tmp/sysinfo_sub.log
 grep -F "cpu=" /tmp/sysinfo_sub.log > /dev/null
