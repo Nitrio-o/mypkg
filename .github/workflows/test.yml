@@ -1,14 +1,25 @@
 name: test
-on: [push]
+
+on:
+  push:
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-22.04
     container: ryuichiueda/ubuntu22.04-ros2:latest
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
       - name: build and test
+        shell: bash
         run: |
+          set -eux
           rsync -av ./ /root/ros2_ws/src/sysinfo_pub/
           cd /root/ros2_ws
+
+          # ROS 2 を有効化（このコンテナはここを source しないと ros2 が PATH に乗らないことがある）
+          source /opt/ros/*/setup.bash || source /opt/ros/foxy/setup.bash
+
           bash -xv ./src/sysinfo_pub/test/test.bash /root
