@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: 2025 Ryusei Abe
+# SPDX-FileCopyrightText: 2026 Ryusei Abe
 # SPDX-License-Identifier: BSD-3-Clause
+
+from __future__ import annotations
 
 import rclpy
 from rclpy.node import Node
-from person_msgs.srv import Query
+from std_msgs.msg import String
 
-rclpy.init()
-node = Node("listener")
 
-def main():
-    client = node.create_client(Query, 'query')
-    while not client.wait_for_service(timeout_sec=1.0):
-        node.get_logger().info('待機中')
+class SysinfoSubscriber(Node):
+    def __init__(self) -> None:
+        super().__init__("sysinfo_sub")
+        self.sub = self.create_subscription(String, "sysinfo", self._cb, 10)
 
-    req = Query.Request()
-    req.name = "上田隆一"
-    future = client.call_async(req)
+    def _cb(self, msg: String) -> None:
+        # ログとして出す（標準出力に人間向け文を出すのを避ける）
+        self.get_logger().info(msg.data)
 
-    while rclpy.ok():
-        rclpy.spin_once(node)
-        if future.done():
-            try:
-                response = future.result()
-            except Exception:
-                node.get_logger().info('呼び出し失敗')
-            else:
-                node.get_logger().info("age: {}".format(response.age))
-            break
 
-    node.destroy_node()
-    rclpy.shutdown()
+def main() -> None:
+    rclpy.init()
+    node = SysinfoSubscriber()
+    try:
+        rclpy.spin(node)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
