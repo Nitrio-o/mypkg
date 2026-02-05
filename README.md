@@ -39,6 +39,7 @@ ROS 2 における Publisher / Subscriber モデルを用いた通信例とし�
 
 ```bash
 $ ros2 run sysinfo_pub sysinfo_pub
+```
 
 ## 動作環境
 
