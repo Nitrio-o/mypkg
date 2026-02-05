@@ -27,7 +27,7 @@ ROS 2 における Publisher / Subscriber モデルを用いた通信例とし�
 
 - `/sysinfo`
 
-**publish 内容（例）**
+**publish 内容**
 
 - OS 情報
 - CPU 情報
