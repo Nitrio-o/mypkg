@@ -12,7 +12,7 @@ colcon build --symlink-install --packages-select sysinfo_pub
 source "$dir/ros2_ws/install/setup.bash"
 
 # publisher 起動
-timeout 15 ros2 run sysinfo_pub sysinfo_pub > /tmp/sysinfo_pub.log 2>&1 &
+timeout 20 ros2 run sysinfo_pub sysinfo_pub > /tmp/sysinfo_pub.log 2>&1 &
 PUB_PID=$!
 
 # topic が見えるまで待つ（最大10秒）
@@ -23,12 +23,19 @@ for i in $(seq 1 20); do
 done
 test "$ok" -eq 1
 
-# subscriber を動かして受信ログを取る
-timeout 10 ros2 run sysinfo_pub sysinfo_sub > /tmp/sysinfo_sub.log 2>&1 || true
+# subscriber をバックグラウンドで起動して受信ログを取る
+: > /tmp/sysinfo_sub.log
+timeout 20 ros2 run sysinfo_pub sysinfo_sub >> /tmp/sysinfo_sub.log 2>&1 &
+SUB_PID=$!
 
-# 受信できたことの証明：ログが空でない＆ cpu= を含む行がある
-test -s /tmp/sysinfo_sub.log
-grep -F "cpu=" /tmp/sysinfo_sub.log > /dev/null
+# cpu= がログに出るまで待つ（最大10秒）
+ok=0
+for i in $(seq 1 20); do
+  grep -F "cpu=" /tmp/sysinfo_sub.log >/dev/null && ok=1 && break
+  sleep 0.5
+done
+test "$ok" -eq 1
 
 # 後片付け
+kill "$SUB_PID" 2>/dev/null || true
 kill "$PUB_PID" 2>/dev/null || true
