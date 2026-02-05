@@ -39,3 +39,28 @@ ROS 2 における Publisher / Subscriber モデルを用いた通信例とし�
 
 ```bash
 $ ros2 run sysinfo_pub sysinfo_pub
+
+## 動作環境
+
+- Ubuntu 24.04 LTS
+- ROS 2
+- Python 3.7–3.10
+
+## テスト
+
+本パッケージには自動テストが含まれており、GitHub Actions により以下を確認しています。
+
+- ノードが正常に起動すること
+- 指定したトピックが生成されること
+- Subscriber が publish されたデータを受信できること
+
+## ライセンス
+
+本ソフトウェアは BSD 3-Clause License の下で公開されています。  
+詳細は `LICENSE` ファイルを参照してください。
+
+## 謝辞
+
+本パッケージは、千葉工業大学「ロボットシステム学」の講義資料を参考に作成しました。
+
+© 2026 Ryusei Abe
