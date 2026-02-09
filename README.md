@@ -1,5 +1,7 @@
 # sysinfo_pub (ROS 2 package)
 
+![test](https://github.com/Nitrio-o/mypkg/actions/workflows/test.yml/badge.svg)
+
 ## 概要
 
 `sysinfo_pub` は、ROS 2 上で動作するシステム情報配信ノードを提供するパッケージです。  
